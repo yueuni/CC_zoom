@@ -1,7 +1,7 @@
-const http = require('http')
-const WebSocket = require('ws')
+const http = require("http")
+const SocketIO = require("socket.io")
 const express = require("express")
-const { parse } = require('path')
+const { parse, join } = require('path')
 const app = express()
 
 const port = 3000
@@ -13,33 +13,31 @@ app.get("/", (_, res) => res.render("home"))
 app.get("/*", (_, res) => res.redirect("/"))
 
 
-const server = http.createServer(app)
-const wss = new WebSocket.Server({ server })
+const httpServer = http.createServer(app)
+const wsServer = SocketIO(httpServer)
 
-const onClose = _ => console.log("Disconnected from the Browser")
-const onMsg = msg => console.log(msg.toString())
+const getJoinedRooms = id => [...wsServer.sockets.adapter.sids.get(id)]
 
-const sockets = []
+wsServer.on("connection", socket => {
+    // 방 참여
+    socket.on("enter_room", (roomName, done) => {
+        socket.join(roomName)
+        done()
+        socket.to(roomName).emit("joined_member")
+    })
 
-wss.on("connection", socket => {
-    socket["nickname"] = "Anon"
-    sockets.push(socket)
-    console.log("Connected to Browser")
+    // 연결 끊김
+    socket.on("disconneting", _ => {
+        const joinedRooms = getJoinedRooms(socket.id)
+        socket.to(joinedRooms).emit("disconnet_mamber")
+    })
 
-    socket.on("close", onClose)
-    socket.on("message", msg => {
-        const message = JSON.parse(msg)
-
-        switch(message.type) {
-            case "new_message": 
-                sockets.forEach(s => {
-                    if(s != socket) s.send(`${socket.nickname} : ${message.payload}`)
-                })
-                break
-            case "nickname": 
-                socket["nickname"] = message.payload
-        }
+    // 새 메세지
+    socket.on("new_message", (msg, done) => {
+        const joinedRooms = getJoinedRooms(socket.id)
+        socket.to(joinedRooms).emit('new_message', msg)
+        done()
     })
 })
 
-server.listen(port, _ => console.log(`Listening on http://localhost:${port}/`))
+httpServer.listen(port, _ => console.log(`Listening on http://localhost:${port}/`))

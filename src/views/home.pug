@@ -8,14 +8,24 @@ html(lang="en")
         link(rel="stylesheet", href="https://unpkg.com/mvp.css")
     body 
         header 
-            h1 Hello
+            h1 Zoom
         main
-            form#nick
-                h3 닉네임
-                input(type="text", placeholder="닉네임을 입력해주세요", required)
-                button 저장
-            ul
-            form#msg
-                input(type="text", placeholder="메세지를 입력해주세요", required)
-                button 전송
+            div#roomList
+                form#join_form
+
+                    h3 방이름
+                    input(type="text", placeholder="방이름을 입력해주세요", required)
+                    button 참여하기
+            div#room
+                form#name_form
+                    h3 닉네임
+                    input(type="text", placeholder="이름을 입력해주세요", required)
+                    button 저장
+                form#msg_form
+                    h1(align="center") ROOM
+                    h3(align="center")
+                    ul
+                    input(type="text", placeholder="메세지를 입력해주세요", required)
+                    button 전송
+        script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js") 
