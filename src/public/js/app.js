@@ -13,7 +13,6 @@ const scrollDown = _ => chat.scrollTop = chat.scrollHeight;
 const enterRoom = _ => {
     room.hidden = false
     roomList.hidden = true
-    room.querySelector('h1').innerText = roomName
 }
 
 const newMsg = (type, msg) => {
@@ -79,4 +78,18 @@ socket.on('send_noti', msg => newMsg('noti', msg))
 socket.on('joined_member', nickname => newMsg('noti', `[${nickname}]님이 참여했습니다.`))
 
 // 다른 멤버 퇴장
-socket.on('disconneting', nickname => newMsg('noti', `[${nickname}]님이 퇴장했습니다.`))
+socket.on('disconnect_member', nickname => newMsg('noti', `[${nickname}]님이 퇴장했습니다.`))
+
+// 방 상태 변동
+socket.on('room_changed', rooms => {
+    const roomListUl = roomList.querySelector('ul')
+    roomListUl.innerHTML = ""
+
+    Object.keys(rooms).forEach(room => {
+        const roomLi = document.createElement('li')
+        roomLi.innerText = `${room} (${rooms[room]})`
+        roomListUl.appendChild(roomLi)
+    })
+
+    room.querySelector('h1').innerText = `${roomName} (${rooms[roomName]})`
+})
