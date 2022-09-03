@@ -12,20 +12,19 @@ html(lang="en")
         main
             div#roomList
                 form#join_form
+                    h3 닉네임
+                    input#input_name(type="text", placeholder="이름을 입력해주세요", required)
 
                     h3 방이름
-                    input(type="text", placeholder="방이름을 입력해주세요", required)
+                    input#input_room(type="text", placeholder="방이름을 입력해주세요", required)
                     button 참여하기
             div#room
-                form#name_form
-                    h3 닉네임
-                    input(type="text", placeholder="이름을 입력해주세요", required)
-                    button 저장
                 form#msg_form
-                    h1(align="center") ROOM
-                    h3(align="center")
                     ul
                     input(type="text", placeholder="메세지를 입력해주세요", required)
                     button 전송
+                    h1(align="center")
+                    div#div_bnts(style="text-align:center")
+                        a#btn_chg_name(align="center") 닉네임 변경
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js") 

@@ -10,33 +10,35 @@ room.hidden = true
 const enterRoom = _ => {
     room.hidden = false
     roomList.hidden = true
-    room.querySelector('h3').innerText =  roomName
+    room.querySelector('h1').innerText = roomName
 }
 
 const newMsg = (type, msg) => {
     const li = document.createElement('li')
     li.innerText = msg
     room.querySelector('ul').appendChild(li)
+const initInput = input => {
+    const value = input.value
+    input.value = ""
+    return value
 }
 
 // 방 참여
 const roomListForm = document.getElementById("join_form")
 roomListForm.addEventListener("submit", event => {
     event.preventDefault()
-    const input = roomListForm.querySelector('input')
-    socket.emit("enter_room", input.value, enterRoom)
-    roomName = input.value
-    input.value = ""
+    const nickname = roomListForm.querySelector('#input_name')
+    const inputRoomName = roomListForm.querySelector('#input_room')
+    roomName = initInput(inputRoomName)
+    socket.emit("enter_room", roomName, nickname.value, enterRoom)
 })
 
 // 닉네임 변경
-const roomNameForm = room.querySelector('#name_form')
-roomNameForm.addEventListener("submit", event => {
+const roomNameForm = room.querySelector('#btn_chg_name')
+roomNameForm.addEventListener("click", event => {
     event.preventDefault()
-    const input = roomNameForm.querySelector('input')
-    const name = input.value
-    socket.emit("save_name", name, _ => {})
-    input.value = ""
+    const name = prompt('변경할 닉네임을 입력해주세요')
+    socket.emit("save_name", name, _ => alert('닉네임이 변경되었습니다'))
 })
 
 // 메세지 전송
@@ -44,13 +46,18 @@ const roomMsgForm = room.querySelector('#msg_form')
 roomMsgForm.addEventListener("submit", event => {
     event.preventDefault()
     const input = roomMsgForm.querySelector('input')
-    const msg = input.value
+    const msg = initInput(input)
     socket.emit("new_message", msg, _ => newMsg('to', `You: ${msg}`))
-    input.value = ""
 })
 
 // 메세지 수신
 socket.on('new_message', msg => newMsg('from', msg))
 
-// 방 참여
-socket.on('joined_member', _ => newMsg('from', 'Joind'))
+// 공지
+socket.on('send_noti', msg => newMsg('noti', msg))
+
+// 새로운 멤버 참여
+socket.on('joined_member', nickname => newMsg('noti', `[${nickname}]님이 참여했습니다.`))
+
+// 다른 멤버 퇴장
+socket.on('disconneting', nickname => newMsg('noti', `[${nickname}]님이 퇴장했습니다.`))
