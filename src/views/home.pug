@@ -20,11 +20,12 @@ html(lang="en")
                     button 참여하기
             div#room
                 form#msg_form
-                    ul
-                    input(type="text", placeholder="메세지를 입력해주세요", required)
-                    button 전송
                     h1(align="center")
                     div#div_bnts(style="text-align:center")
                         a#btn_chg_name(align="center") 닉네임 변경
+                    ul(style="padding:0;overflow:scroll;height:240px")
+                    div(style="height:50px;display:flex;flex-wrap:wrap")
+                        input(type="text", placeholder="메세지를 입력해주세요", required, style="flex-grow:1;margin:0 10px 0 0")
+                        button(style="flex-grow:0;margin:0") 전송
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js") 

@@ -2,10 +2,13 @@ const socket = io()
 
 const roomList = document.getElementById("roomList")
 const room = document.getElementById("room")
+const chat = room.querySelector('ul')
 
 let roomName;
 
 room.hidden = true
+
+const scrollDown = _ => chat.scrollTop = chat.scrollHeight;
 
 const enterRoom = _ => {
     room.hidden = false
@@ -16,7 +19,23 @@ const enterRoom = _ => {
 const newMsg = (type, msg) => {
     const li = document.createElement('li')
     li.innerText = msg
-    room.querySelector('ul').appendChild(li)
+    li.style.listStyle = "none"
+
+    //스타일 설정
+    switch (type) {
+        case "noti":
+            li.style.color = "#bab7b7"
+            li.style.textAlign = "center"
+            break
+        case "to":
+            li.style.textAlign = "end"
+            break
+    }
+
+    chat.appendChild(li)
+    scrollDown()
+}
+
 const initInput = input => {
     const value = input.value
     input.value = ""
