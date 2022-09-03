@@ -21,7 +21,7 @@ const wsServer = new Server(httpServer, {
     }
 })
 
-instrumentj(wsServer, {
+instrument(wsServer, {
     auth: false
 })
 
